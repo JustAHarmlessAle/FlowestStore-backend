@@ -20,6 +20,9 @@ routercategoria.get("/",
   autenticar, 
   obtenerTodasLasCategorias)
 
+routercategoria.get("/Categorias/DeLa/Home/Page",
+  obtenerTodasLasCategorias)
+
 routercategoria.get("/:id", autenticar, 
 validarIdCategoria, 
 obtenerCategoriaPorId)

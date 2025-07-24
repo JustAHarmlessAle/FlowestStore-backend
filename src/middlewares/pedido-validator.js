@@ -9,9 +9,6 @@ const validarErrores = (req, res, next) => {
 };
 
 export const validarCreacionPedido = [
-  body("id_cliente")
-    .notEmpty().withMessage("El ID del cliente es obligatorio")
-    .isInt().withMessage("El ID del cliente debe ser un número entero"),
 
   body("productos.*.id_producto")
     .notEmpty().withMessage("El ID del producto es obligatorio")
@@ -31,6 +28,13 @@ export const validarCreacionPedido = [
     .optional()
     .isIn(["pendiente", "preparacion", "terminado", "cancelado"])
     .withMessage("Estado no válido. Debe ser: 'pendiente', 'preparacion', 'terminado' o 'cancelado'"),
+
+  body().custom(body => {
+    if (!body.id_cliente && !body.documentoIdentidad) {
+      throw new Error("Debe proporcionar el id_cliente o el documentoIdentidad");
+    }
+    return true;
+  }),
 
   validarErrores,
 ];

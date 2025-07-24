@@ -27,11 +27,15 @@ const Cliente = sequelize.define(
     correoElectronico: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      unique: false,
+      unique: true, // Cambiado a true para autenticación
       validate: { 
         isEmail: true,
       },
     }, 
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     telefono: {
       type: DataTypes.STRING(15),
       allowNull: false,
@@ -40,11 +44,6 @@ const Cliente = sequelize.define(
       type: DataTypes.STRING(200),
       allowNull: false,
     },
-    genero: {
-      type: DataTypes.ENUM("masculino", "femenino", "otro"),
-      allowNull: false,
-    },
- 
     fechaRegistro: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

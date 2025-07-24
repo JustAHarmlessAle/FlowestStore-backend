@@ -11,6 +11,11 @@ export class ClienteService {
     return cliente
   }
 
+  async obtenerClientePorCorreo(correoElectronico) {
+    const cliente = await Cliente.findOne({ where: { correoElectronico } })
+    return cliente
+  }
+
   async crearCliente(clienteData) {
     return await Cliente.create(clienteData)
   }
