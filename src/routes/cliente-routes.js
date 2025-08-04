@@ -6,6 +6,8 @@ import {
   actualizarCliente,
   eliminarCliente,
   cambiarEstadoCliente,
+  registrarCliente,
+  loginCliente,
 } from "../controllers/cliente-controller.js";
 import {
   validarCreacionCliente,
@@ -32,9 +34,16 @@ router.get("/clientesActivos", async (req, res) => {
   }
 });
 
+// Ruta pública para registro de clientes
+router.post("/registro", registrarCliente);
+
+// Ruta pública para login de clientes
+router.post("/login", loginCliente);
+
 router.get("/", obtenerTodosLosClientes);
 router.get(
-  "/:id", autenticar,
+  "/:id",
+  autenticar,
   validarIdCliente,
   obtenerClientePorId
 );

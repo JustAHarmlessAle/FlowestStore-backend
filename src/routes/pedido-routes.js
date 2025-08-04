@@ -24,8 +24,8 @@ routerpedido.get("/:id",//autenticar, validarIdPedido,
                  //autenticacion
    obtenerPorId)
 routerpedido.post("/", 
-  autenticar, 
-  verificarPermiso("pedidos", "crear"), 
+  // autenticar, 
+  // verificarPermiso("pedidos", "crear"), 
   validarCreacionPedido, 
   crearpedidos
 )

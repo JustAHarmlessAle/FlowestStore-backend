@@ -47,17 +47,25 @@ export class PedidoService {
   }
 
   async crearpedidos(pedidoData) {
-    const { productos, ...datosPedido } = pedidoData;
+    const { productos, id_cliente, documentoIdentidad, ...datosPedido } = pedidoData;
 
     if (!productos?.length) {
       throw new Error("Debe incluir al menos un producto");
+    }
+
+    if (!id_cliente && !documentoIdentidad) {
+      throw new Error("Debe proporcionar el id_cliente o el documentoIdentidad");
     }
 
     let transaction;
     try {
       transaction = await sequelize.transaction();
 
-      const pedido = await Pedido.create(datosPedido, { transaction });
+      let pedidoPayload = { ...datosPedido, total: 0 };
+      if (id_cliente) pedidoPayload.id_cliente = id_cliente;
+      if (documentoIdentidad) pedidoPayload.documentoIdentidad = documentoIdentidad;
+
+      const pedido = await Pedido.create(pedidoPayload, { transaction });
 
       for (const p of productos) {
         // Modificado aquí: usar p.id_producto en lugar de p.producto_id

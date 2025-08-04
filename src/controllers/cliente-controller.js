@@ -1,4 +1,6 @@
 import { ClienteService } from "../services/cliente-service.js"
+import bcrypt from "bcryptjs"
+import { generarToken } from "../utils/jwt.js"
 
 const clienteService = new ClienteService()
 
@@ -20,7 +22,6 @@ export async function obtenerClientePorId(req, res) {
     if (!cliente) {
       return res.status(404).json({ exito: false, mensaje: "Cliente no encontrado" })
     }
-
     res.status(200).json({ exito: true, data: cliente })
   } catch (error) {
     console.error("Error al obtener cliente por ID:", error)
@@ -38,7 +39,13 @@ export async function crearCliente(req, res) {
     // Agregar información del usuario que crea el cliente
     clienteData.creadoPor = req.usuario.id
 
-    const nuevoCliente = await clienteService.crearCliente(clienteData)
+    // Encriptar la contraseña
+    const hashedPassword = await bcrypt.hash(clienteData.password, 10)
+
+    const nuevoCliente = await clienteService.crearCliente({
+      ...clienteData,
+      password: hashedPassword,
+    })
     res.status(201).json({
       exito: true,
       data: nuevoCliente,
@@ -56,10 +63,16 @@ export async function crearCliente(req, res) {
 export async function actualizarCliente(req, res) {
   try {
     const { id } = req.params
-    const clienteData = req.body
+    let clienteData = req.body
 
     // Agregar información del usuario que actualiza el cliente
     clienteData.actualizadoPor = req.usuario.id
+    const hashedPassword = await bcrypt.hash(clienteData.password, 10)
+
+    clienteData = {
+      ...clienteData,
+      password: hashedPassword// Encriptar la contraseña
+,}
 
     const clienteActualizado = await clienteService.actualizarCliente(id, clienteData)
 
@@ -133,6 +146,94 @@ export async function cambiarEstadoCliente(req, res) {
       return res.status(400).json({ exito: false, mensaje: error.message })
     }
     res.status(500).json({ exito: false, mensaje: "Error interno del servidor" })
+  }
+}
+
+export async function registrarCliente(req, res) {
+  try {
+    const { nombreCompleto, tipoDocumento, documentoIdentidad, correoElectronico, password, telefono, direccion } = req.body
+
+    // Validar que el correo no exista
+    const clienteExistente = await clienteService.obtenerClientePorCorreo(correoElectronico)
+    if (clienteExistente) {
+      return res.status(400).json({ exito: false, mensaje: "El correo electrónico ya está registrado" })
+    }
+
+    // Encriptar la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    const nuevoCliente = await clienteService.crearCliente({
+      nombreCompleto,
+      tipoDocumento,
+      documentoIdentidad,
+      correoElectronico,
+      password: hashedPassword,
+      telefono,
+      direccion,
+      estado: "activo"
+    })
+
+    res.status(201).json({
+      exito: true,
+      mensaje: "Cliente registrado exitosamente",
+      data: {
+        id: nuevoCliente.id,
+        nombreCompleto: nuevoCliente.nombreCompleto,
+        correoElectronico: nuevoCliente.correoElectronico
+      }
+    })
+  } catch (error) {
+    console.error("Error al registrar cliente:", error)
+    res.status(500).json({ exito: false, mensaje: "Error interno del servidor" })
+  }
+}
+
+export async function loginCliente(req, res) {
+  try {
+    const { correoElectronico, password } = req.body
+
+    // Buscar cliente por correo
+    const cliente = await clienteService.obtenerClientePorCorreo(correoElectronico)
+    if (!cliente) {
+      return res.status(404).json({ exito: false, mensaje: "Cliente no encontrado" })
+    }
+
+    // Validar contraseña
+    const esPasswordValido = await bcrypt.compare(password, cliente.password)
+    if (!esPasswordValido) {
+      return res.status(401).json({ exito: false, mensaje: "Contraseña incorrecta" })
+    }
+
+    // Generar token JWT
+    const token = generarToken({
+      id: cliente.id,
+      nombre: cliente.nombreCompleto,
+      email: cliente.correoElectronico,
+      tipo: "cliente"
+    })
+
+    // Opcional: establecer cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 60 * 60 * 1000,
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    })
+
+    res.status(200).json({
+      exito: true,
+      mensaje: "Inicio de sesión exitoso",
+      token,
+      cliente: {
+        id: cliente.id,
+        nombreCompleto: cliente.nombreCompleto,
+        correoElectronico: cliente.correoElectronico,
+      },
+    })
+  } catch (error) {
+    console.error("Error al iniciar sesión de cliente:", error)
+    res.status(500).json({ exito: false, mensaje: "Error interno al iniciar sesión" })
   }
 }
 

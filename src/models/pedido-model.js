@@ -15,14 +15,12 @@ const Pedido = sequelize.define(
 
     id_cliente: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true, // <-- Permitir nulo si no hay cliente registrado
       references: {
         model: Cliente,
         key: "id",
       },
     },
-
-  
 
     total: {
       type: DataTypes.FLOAT,
@@ -51,10 +49,14 @@ const Pedido = sequelize.define(
       allowNull: false,
       defaultValue: "pendiente",
     },
+
+    documentoIdentidad: {
+      type: DataTypes.STRING(20),
+      allowNull: true, // Solo se llena si el cliente no está registrado
+    },
   },
   {
     timestamps: true,
-  
   }
 );
 // Método para calcular el total
