@@ -110,6 +110,7 @@ export const obtenerUsuarios = async (req, res) => {
         nombre: usuario.nombre,
         email: usuario.email,
         id_rol: usuario.id_rol,
+        cedula: usuario.cedula
       })),
     })
   } catch (error) {

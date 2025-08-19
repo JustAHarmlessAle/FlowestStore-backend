@@ -35,7 +35,7 @@ export async function obtenerClientePorId(req, res) {
 export async function crearCliente(req, res) {
   try {
     const clienteData = req.body
-    
+
     // Agregar información del usuario que crea el cliente
     clienteData.creadoPor = req.usuario.id
 
@@ -67,12 +67,20 @@ export async function actualizarCliente(req, res) {
 
     // Agregar información del usuario que actualiza el cliente
     clienteData.actualizadoPor = req.usuario.id
-    const hashedPassword = await bcrypt.hash(clienteData.password, 10)
+
+    if (clienteData.password) {
+      const hashedPassword = await bcrypt.hash(clienteData.password, 10)
+
+      clienteData = {
+        ...clienteData,
+        password: hashedPassword// Encriptar la contraseña
+        ,
+      }
+    }
 
     clienteData = {
       ...clienteData,
-      password: hashedPassword// Encriptar la contraseña
-,}
+    }
 
     const clienteActualizado = await clienteService.actualizarCliente(id, clienteData)
 
