@@ -140,3 +140,30 @@ export async function cambiarEstadopedidos(req, res) {  // Mantenemos el nombre 
   }
   
 }
+
+// 👇 AÑADE ESTA NUEVA FUNCIÓN AL FINAL DEL ARCHIVO
+export async function obtenerPedidosPorCliente(req, res) {
+  try {
+    const { clienteId } = req.params;
+    const usuarioAutenticado = req.usuario; // Esto viene del middleware 'autenticar'
+
+    // Medida de seguridad CRÍTICA:
+    // Un usuario solo puede ver sus propios pedidos.
+    // Comparamos el ID del token con el ID de la URL.
+    if (usuarioAutenticado.id !== parseInt(clienteId, 10)) {
+      return res.status(403).json({ exito: false, mensaje: "Acceso prohibido. No puedes ver los pedidos de otro cliente." });
+    }
+
+    const pedidos = await pedidoService.obtenerPedidosPorClienteId(clienteId);
+
+    // Es importante devolver un array vacío si no hay pedidos, no un error.
+    if (!pedidos) {
+      return res.status(200).json({ exito: true, data: [] });
+    }
+
+    res.status(200).json({ exito: true, data: pedidos });
+  } catch (error) {
+    console.error("Error al obtener los pedidos del cliente:", error);
+    res.status(500).json({ exito: false, mensaje: "Error interno del servidor" });
+  }
+}

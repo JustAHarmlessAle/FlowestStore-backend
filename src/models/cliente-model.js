@@ -34,7 +34,7 @@ const Cliente = sequelize.define(
     }, 
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     telefono: {
       type: DataTypes.STRING(15),

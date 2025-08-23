@@ -12,6 +12,7 @@ import {
   validarIdProducto,
 } from "../middlewares/productos-validator.js"
 import { autenticar, verificarPermiso } from "../middlewares/autenticador-validator.js" // Asumiendo que este es el archivo correcto
+import upload from "../middlewares/multer.js"; // 👈 1. IMPORTAR MULTER
 
 const routerProductos = Router()
 
@@ -23,6 +24,7 @@ routerProductos.get("/:id", validarIdProducto, obtenerProductoPorID)
 routerProductos.post("/",
   autenticar,
   verificarPermiso("productos", "crear"),
+  upload.single('imagen'), // 👈 Multer procesará un solo archivo del campo 'imagen'
   validarCreacionProducto,
   crearProductos
 )
@@ -31,6 +33,7 @@ routerProductos.put(
   "/:id",
   autenticar,
   verificarPermiso("productos", "editar"),
+  upload.single('imagen'), // 👈 También aquí para la actualización
   validarIdProducto,
   validarActualizacionProducto,
   actualizarProductos
