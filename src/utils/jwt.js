@@ -17,6 +17,7 @@ export const generarToken = (usuario) => {
     nombre: usuario.nombre,
     email: usuario.email,
     id_rol: usuario.id_rol,
+    tipo: usuario.tipo
   }
 
   // Generar token con expiración de 24 horas

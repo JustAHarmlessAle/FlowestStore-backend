@@ -6,6 +6,7 @@ import {
   actualizarpedidos,
   eliminarpedidos,
   cambiarEstadopedidos,
+  obtenerPedidosPorCliente,
 } from "../controllers/pedido-controller.js"
 import {
   validarCreacionPedido,
@@ -16,6 +17,8 @@ import {
 import { autenticar, autorizarAdmin, verificarPermiso } from "../middlewares/autenticador-validator.js"
 
 const routerpedido = Router()
+
+routerpedido.get("/cliente/:clienteId", autenticar, obtenerPedidosPorCliente);
 
 
 routerpedido.get("/pedido",// autenticar,

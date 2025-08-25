@@ -25,6 +25,25 @@ export class PedidoService {
     });
   }
 
+  // 👇 AÑADE ESTA NUEVA FUNCIÓN
+  async obtenerPedidosPorClienteId(clienteId) {
+    return await Pedido.findAll({
+      where: { id_cliente: clienteId },
+      include: [
+        {
+          model: Producto,
+          attributes: ["nombre", "imagenUrl"], // Traemos solo lo necesario del producto
+          through: {
+            // A través de la tabla intermedia
+            model: PedidoProducto,
+            attributes: ["cantidad", "precio_unitario"], // Traemos la cantidad y el precio de ese momento
+          },
+        },
+      ],
+      order: [["fecha_pedido", "DESC"]], // Ordenar por los más recientes primero
+    });
+  }
+
   async obtenerPorId(id) {
     const pedido = await Pedido.findByPk(id, {
       include: [

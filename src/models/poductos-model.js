@@ -1,6 +1,6 @@
-import { DataTypes } from "sequelize"
-import { sequelize } from "../config/database.js"
-import Categoria from "./categoria-model.js"
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/database.js";
+import Categoria from "./categoria-model.js";
 
 const Producto = sequelize.define(
   "Producto",
@@ -35,16 +35,16 @@ const Producto = sequelize.define(
       },
     },
     imagenUrl: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
-Producto.belongsTo(Categoria, { foreignKey: "Id_Categoria" })
-Categoria.hasMany(Producto, { foreignKey: "Id_Categoria" })
+Producto.belongsTo(Categoria, { foreignKey: "Id_Categoria" });
+Categoria.hasMany(Producto, { foreignKey: "Id_Categoria" });
 
-export default Producto
+export default Producto;

@@ -41,12 +41,6 @@ export async function validarCreacionCliente(req, res, next) {
         .notEmpty().withMessage("La dirección es obligatoria")
         .isLength({ min: 5, max: 200 }).withMessage("Debe tener entre 5 y 200 caracteres")
         .run(req),
-
-      body("genero")
-        .notEmpty().withMessage("El género es obligatorio")
-        .isIn(["masculino", "femenino", "0tro"])
-        .withMessage("Debe ser: masculino, femenino , otro")
-        .run(req)
     ]);
 
     
